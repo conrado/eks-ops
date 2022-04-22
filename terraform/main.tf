@@ -22,7 +22,7 @@ provider "kubernetes" {
 
 locals {
   name   = "ex-${replace(basename(path.cwd), "_", "-")}"
-  region = "eu-west-1"
+  region = "sa-east-1"
 
   tags = {
     Example    = local.name
@@ -95,38 +95,39 @@ module "eks" {
   }
 
   # Self Managed Node Group(s)
-  self_managed_node_group_defaults = {
-    vpc_security_group_ids       = [aws_security_group.additional.id]
-    iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-  }
+  # self_managed_node_group_defaults = {
+  #   vpc_security_group_ids       = [aws_security_group.additional.id]
+  #   iam_role_additional_policies = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+  # }
 
-  self_managed_node_groups = {
-    spot = {
-      instance_type = "m5.large"
-      instance_market_options = {
-        market_type = "spot"
-      }
+  # self_managed_node_groups = {
+  #   spot = {
+  #     instance_type = "m5.large"
+  #     instance_market_options = {
+  #       market_type = "spot"
+  #     }
 
-      pre_bootstrap_user_data = <<-EOT
-      echo "foo"
-      export FOO=bar
-      EOT
+  #     pre_bootstrap_user_data = <<-EOT
+  #     echo "foo"
+  #     export FOO=bar
+  #     EOT
 
-      bootstrap_extra_args = "--kubelet-extra-args '--node-labels=node.kubernetes.io/lifecycle=spot'"
+  #     bootstrap_extra_args = "--kubelet-extra-args '--node-labels=node.kubernetes.io/lifecycle=spot'"
 
-      post_bootstrap_user_data = <<-EOT
-      cd /tmp
-      sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-      sudo systemctl enable amazon-ssm-agent
-      sudo systemctl start amazon-ssm-agent
-      EOT
-    }
-  }
+  #     post_bootstrap_user_data = <<-EOT
+  #     cd /tmp
+  #     sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+  #     sudo systemctl enable amazon-ssm-agent
+  #     sudo systemctl start amazon-ssm-agent
+  #     EOT
+  #   }
+  # }
 
   # EKS Managed Node Group(s)
   eks_managed_node_group_defaults = {
-    ami_type       = "AL2_x86_64"
-    instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
+    ami_type = "AL2_x86_64"
+    # instance_types = ["m6i.large", "m5.large", "m5n.large", "m5zn.large"]
+    instance_types = ["m6i.large", "m5.large", "m5zn.large"]
 
     attach_cluster_primary_security_group = true
     vpc_security_group_ids                = [aws_security_group.additional.id]
