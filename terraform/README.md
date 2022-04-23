@@ -22,3 +22,14 @@ kubectl apply -f ./deployment.yml
 kubectl apply -f ./service-loadbalancer.yml
 kubectl apply -f ./ingress.yml
 ```
+
+Following instruction on https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.2/deploy/installation/
+
+added the eks helm repo:
+
+```
+helm repo add eks https://aws.github.io/eks-charts
+kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller -n kube-system --set clusterName=ice01 --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller
+```
+
