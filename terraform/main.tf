@@ -14,7 +14,8 @@ provider "kubernetes" {
   host                   = data.aws_eks_cluster.cluster.endpoint
   cluster_ca_certificate = base64decode(data.aws_eks_cluster.cluster.certificate_authority.0.data)
   token                  = data.aws_eks_cluster_auth.cluster.token
-  load_config_file       = false
+  config_path            = "~/.kube/config"
+  # config_context         = local.cluster_name
 }
 
 data "aws_availability_zones" "available" {
@@ -26,7 +27,7 @@ locals {
 }
 
 module "vpc" {
-  source  = "terraform-aws-modules/aws/vpc"
+  source  = "terraform-aws-modules/vpc/aws"
   version = "~> 3.14"
 
   name                 = "ice01"
@@ -49,22 +50,21 @@ module "vpc" {
 }
 
 module "eks" {
-  source  = "terraform-aws-modules/aws/eks"
-  version = "~> 3.14"
+  source  = "terraform-aws-modules/eks/aws"
+  version = "~> 18.20"
 
   cluster_name    = local.cluster_name
   cluster_version = "1.22"
-  subnets         = module.vpc.private_subnets
-  vpc_id          = module.vpc.id
+  subnet_ids      = module.vpc.private_subnets
+  vpc_id          = module.vpc.vpc_id
 
-  node_groups = {
-    first = {
+  eks_managed_node_groups = {
+    blue = {}
+    green = {
       desired_capacity = 1
       max_capacity     = 10
       min_capacity     = 1
-      instance_type    = "m5.large"
+      instance_types   = ["m5.large"]
     }
   }
-  write_kubeconfig   = true
-  config_output_path = "./"
 }
