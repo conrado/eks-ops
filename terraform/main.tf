@@ -10,6 +10,26 @@ data "aws_eks_cluster_auth" "cluster" {
   name = module.eks.cluster_id
 }
 
+resource "aws_iam_policy" "albc" {
+  name_prefix = "albc"
+  description = "Additional policy for EKS cluster to manage the AWS load-balancer controller"
+  policy      = file("${path.module}/albc-iam-policy.json")
+}
+
+# not sure if we need this... this would be the cluster iam role, let's try
+#   to add policies to auto-generated role first
+# module "iam_eks_role_ice01" {
+#   source = "terraform-aws-modules/iam/aws//modules/iam-eks-role"
+#   name = "iam-eks-role-ice01"
+
+#   cluster_service_accounts = {
+#     "ice01" = [
+#       "default:blue",
+#       "default:green",
+#     ]
+#   }
+# }
+
 module "irsa_role_ice01" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
@@ -158,8 +178,10 @@ module "irsa_role_load_balancer_controller_ice01" {
 
   oidc_providers = {
     kubesys = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
+      provider_arn = module.eks.oidc_provider_arn
+      namespace_service_accounts = [
+        "kube-system:aws-load-balancer-controller",
+      ]
     }
   }
 }
@@ -300,13 +322,39 @@ module "eks" {
   subnet_ids      = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
 
+  # create_iam_role = false
+  # iam_role_arn    = module.irsa_role_ice01.iam_role_arn
+  iam_role_additional_policies = [aws_iam_policy.albc.id]
+
   eks_managed_node_groups = {
-    blue = {}
+    blue = {
+      metadata_http_put_response_hop_limit = 2
+      iam_role_additional_policies         = [aws_iam_policy.albc.id]
+    }
     green = {
-      desired_capacity = 1
-      max_capacity     = 10
-      min_capacity     = 1
-      instance_types   = ["m5.large"]
+      desired_capacity                     = 1
+      max_capacity                         = 10
+      min_capacity                         = 1
+      instance_types                       = ["m5.large"]
+      metadata_http_put_response_hop_limit = 2
+      iam_role_additional_policies         = [aws_iam_policy.albc.id]
     }
   }
+
+
+  node_security_group_additional_rules = {
+    ingress_allow_access_from_control_plane = {
+      type                          = "ingress"
+      protocol                      = "tcp"
+      from_port                     = 9443
+      to_port                       = 9443
+      source_cluster_security_group = true
+      description                   = "Allow access from control plane to webhook port of AWS load balancer controller"
+    }
+  }
+
+  depends_on = [
+    aws_iam_policy.albc
+  ]
+
 }
