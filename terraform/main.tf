@@ -233,3 +233,42 @@ resource "kubernetes_cluster_role_binding" "this" {
     namespace = kubernetes_service_account.this.metadata[0].namespace
   }
 }
+
+resource "helm_release" "albc" {
+  # version         = "1.4.1"
+  name            = "aws-load-balancer-controller"
+  chart           = "aws-load-balancer-controller"
+  repository      = "https://aws.github.io/eks-charts"
+  namespace       = "kube-system"
+  cleanup_on_fail = true
+
+  set {
+    name  = "clusterName"
+    value = local.cluster_name
+  }
+
+  set {
+    name  = "serviceAccount.name"
+    value = "aws-load-balancer-controller"
+  }
+
+  set {
+    name  = "serviceAccount.create"
+    value = "false"
+  }
+
+  # set {
+  #   name  = "region"
+  #   value = "sa-east-1"
+  # }
+
+  # set {
+  #   name  = "vpcId"
+  #   value = module.vpc.vpc_id
+  # }
+
+  # set {
+  #   name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+  #   value = module.irsa_role_load_balancer_controller_ice01.iam_role_arn
+  # }
+}
