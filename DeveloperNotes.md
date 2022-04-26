@@ -1,10 +1,6 @@
-# eks-ops
+# Developer Notes
 
-This was built by updating some versions of the tutorial described here:
-
-https://learnk8s.io/terraform-eks
-
-current working state is as follows
+## setting up vpc, eks and albc
 
 to put up the cluster and generate your kube config:
 
