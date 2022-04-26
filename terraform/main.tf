@@ -153,7 +153,8 @@ resource "kubernetes_service_account" "this" {
   }
 }
 
-resource "kubernetes_cluster_role" "this" {
+# should we use just a kubernetes_role here?
+resource "kubernetes_cluster_role" "aws_load_balancer_controller" {
   metadata {
     name = "aws-load-balancer-controller"
 
@@ -210,7 +211,7 @@ resource "kubernetes_cluster_role" "this" {
   }
 }
 
-resource "kubernetes_cluster_role_binding" "this" {
+resource "kubernetes_cluster_role_binding" "aws_load_balancer_controller" {
   metadata {
     name = "aws-load-balancer-controller"
 
@@ -223,14 +224,14 @@ resource "kubernetes_cluster_role_binding" "this" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.this.metadata[0].name
+    name      = kubernetes_cluster_role.aws_load_balancer_controller.metadata[0].name
   }
 
   subject {
     api_group = ""
     kind      = "ServiceAccount"
-    name      = kubernetes_service_account.this.metadata[0].name
-    namespace = kubernetes_service_account.this.metadata[0].namespace
+    name      = kubernetes_service_account.aws_load_balancer_controller.metadata[0].name
+    namespace = kubernetes_service_account.aws_load_balancer_controller.metadata[0].namespace
   }
 }
 
