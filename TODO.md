@@ -3,7 +3,8 @@
 - [x] provisioned with terraform
 - [x] kubernetes running on aws eks
 - [x] aws-load-balancer-controller
-- [ ] cert-manager & route53
+- [x] route53, acm, cloudfront
+- [ ] move all hello-kubernetes sample app to terraform resources
 - [ ] istio
 - [ ] flux
 - [ ] find/build a sample app that uses both apigw and dynamodb

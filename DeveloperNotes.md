@@ -1,39 +1,36 @@
 # Developer Notes
 
-## setting up vpc, eks and albc
+## setup everything
 
 to put up the cluster and generate your kube config:
 
-```
+```console
 terraform init
 terraform apply
 aws eks --region sa-east-1 update-kubeconfig --name ice01
 kubectl get nodes
 ```
 
-to deploy the sample app:
+to deploy the sample app (let's work on automating this next):
 
-```
+```console
 kubectl apply -f ./deployment.yml
-kubectl port-forward service/hello-kubernetes 8080:8080
-```
-
-now you can test by pointint your browser locally to
-
-http://localhost:8080
-
-then you should be able to apply the ALB ingress:
-
-```
 kubectl apply -f ./nodePort.yml
-kubectl apply -f ./ingress.yml
 ```
 
-And now you should be able to connect to the app through the ALB over the
-internet. You can lookup the ALB address with:
+The ALB ingress has been changed to accept only HTTPS connections.
 
-```
-kubectl get ingress
-```
+It is now available on [https://origin.icekernelcloud01.com][1]
 
-be sure to use HTTP not HTTPS, as we are not yet using cert-manager...
+also try accessing the following to see Cloudflare CDN do some magic:
+
+- [https://icekernelcloud01.com][2]
+- [https://www.icekernelcloud01.com][3]
+- [http://icekernelcloud01.com][4]
+- [http://www.icekernelcloud01.com][5]
+
+[1]: https://origin.icekernelcloud01.com
+[2]: https://icekernelcloud01.com
+[3]: https://www.icekernelcloud01.com
+[4]: http://icekernelcloud01.com
+[5]: http://www.icekernelcloud01.com
