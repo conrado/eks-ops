@@ -1,5 +1,20 @@
 # Developer Notes
 
+## requirements for this demo
+
+you'll need to have an AWS account with a registered domain and hosted zone ready
+to deploy to. You should only need to customize the `domain_name` variable in
+`./terraform/variables.tf` (or apply some .tfvars file) and the aws region you
+wish to deploy to in `./terraform/providers.tf`
+
+besides that, you probably need the following:
+
+```console
+tfenv install 1.1.9
+brew install kubectl
+brew install helm
+```
+
 ## setup everything
 
 to put up the cluster and generate your kube config:
@@ -9,13 +24,6 @@ terraform init
 terraform apply
 aws eks --region sa-east-1 update-kubeconfig --name ice01
 kubectl get nodes
-```
-
-to deploy the sample app (let's work on automating this next):
-
-```console
-kubectl apply -f ./deployment.yml
-kubectl apply -f ./nodePort.yml
 ```
 
 The ALB ingress has been changed to accept only HTTPS connections.

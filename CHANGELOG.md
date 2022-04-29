@@ -1,3 +1,7 @@
+# Fri Apr 29 13:01:27 UTC 2022
+
+- moved kubernetes app into terraform configuration
+- updated documentation
 
 # Thu Apr 28 22:05:44 UTC 2022
 

@@ -8,16 +8,20 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
 
   eks_managed_node_groups = {
-    blue = {
+    az1 = {
+      ## keep cluster cheap for now
+      # desired_capacity                     = 1
+      # max_capacity                         = 10
+      # min_capacity                         = 1
+      # instance_types                       = ["m5.large"]
       metadata_http_put_response_hop_limit = 2
     }
-    green = {
-      desired_capacity                     = 1
-      max_capacity                         = 10
-      min_capacity                         = 1
-      instance_types                       = ["m5.large"]
+    az2 = {
       metadata_http_put_response_hop_limit = 2
     }
+    # az3 = {
+    #   metadata_http_put_response_hop_limit = 2
+    # }
   }
 
 
