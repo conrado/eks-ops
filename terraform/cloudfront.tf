@@ -48,7 +48,7 @@ module "cloudfront" {
 
 module "acm" {
   source  = "terraform-aws-modules/acm/aws"
-  version = "~> 3.0"
+  version = "~> 3.4.1"
 
   domain_name               = var.domain_name
   zone_id                   = data.aws_route53_zone.zone.id

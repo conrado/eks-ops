@@ -1,4 +1,3 @@
-
 module "irsa_role_load_balancer_controller" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
@@ -135,11 +134,16 @@ resource "helm_release" "aws_load_balancer_controller" {
     name  = "serviceAccount.create"
     value = "false"
   }
+}
 
-  # set {
-  #   name  = "alb\\.ingress\\.kubernetes\\.io/certificate-arn"
-  #   value = aws_acm_certificate.ice01.arn
-  # }
+module "origin_certificate" {
+  source  = "terraform-aws-modules/acm/aws"
+  version = "~> 3.4.1"
+
+  domain_name = "origin.${var.domain_name}"
+  zone_id     = data.aws_route53_zone.zone.id
+
+  tags = var.tags
 }
 
 resource "kubernetes_ingress_v1" "ice01" {
@@ -150,10 +154,9 @@ resource "kubernetes_ingress_v1" "ice01" {
       "app.kubernetes.io/managed-by" = "terraform"
     }
     annotations = {
-      "kubernetes.io/ingress.class"      = "alb"
-      "alb.ingress.kubernetes.io/scheme" = "internet-facing"
-      # "alb.ingress.kubernetes.io/listen-ports" = "[{'HTTP': 80}, {'HTTPS': 443}]"
-      "alb.ingress.kubernetes.io/certificate-arn" = aws_acm_certificate.ice01.arn
+      "kubernetes.io/ingress.class"               = "alb"
+      "alb.ingress.kubernetes.io/scheme"          = "internet-facing"
+      "alb.ingress.kubernetes.io/certificate-arn" = module.origin_certificate.acm_certificate_arn
     }
   }
   spec {
