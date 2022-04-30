@@ -27,7 +27,7 @@ jobs:
           --branch=${GITHUB_REF#refs/heads/}
           flux create kustomization flux-system \
           --source=flux-system \
-          --path=./clusters/ice01
+          --path=./clusters/my-cluster
       - name: Verify cluster reconciliation
         run: |
           kubectl -n flux-system wait kustomization/istio-operator --for=condition=ready --timeout=2m

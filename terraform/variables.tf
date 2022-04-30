@@ -5,7 +5,7 @@ variable "aws_region" {
 
 variable "cluster_name" {
   type    = string
-  default = "ice01"
+  default = "my-cluster"
 }
 
 variable "domain_name" {
