@@ -2,13 +2,18 @@ module "cloudfront" {
   source  = "terraform-aws-modules/cloudfront/aws"
   version = "~> 2.9.3"
 
-  aliases             = [var.domain_name, "${var.subdomain}.${var.domain_name}"]
-  is_ipv6_enabled     = true
-  price_class         = "PriceClass_All"
+  aliases         = [var.domain_name, "${var.subdomain}.${var.domain_name}"]
+  is_ipv6_enabled = true
+
+  ## PriceClass_All is most expensive: check where your audience lives!
+  # price_class         = "PriceClass_All"
+  # price_class         = "PriceClass_200"
+  price_class = "PriceClass_100"
+
   wait_for_deployment = false
 
   origin = {
-    ice01 = {
+    default = {
       domain_name = "origin.${var.domain_name}"
       custom_origin_config = {
         http_port              = 80
@@ -16,12 +21,22 @@ module "cloudfront" {
         origin_protocol_policy = "https-only"
         origin_ssl_protocols   = ["TLSv1.2"]
       }
+      ## do not uncomment these lines with `enabled = false` or terraform keeps
+      ## complaining about the changes that don't exist
+      # origin_shield = {
+      #   ## origin shield incurs extra charges
+      #   enabled              = true
+      #   origin_shield_region = var.aws_region
+      # }
     }
   }
 
   default_cache_behavior = {
-    target_origin_id       = "ice01"
+    target_origin_id       = "default"
     viewer_protocol_policy = "redirect-to-https"
+
+    compress     = true
+    query_string = true
 
     allowed_methods = [
       "HEAD",
@@ -54,7 +69,7 @@ module "acm" {
   zone_id                   = data.aws_route53_zone.zone.id
   subject_alternative_names = ["${var.subdomain}.${var.domain_name}"]
 
-  # necessary for cloudfront
+  # the location must be us-east-1 for cloudfront to find the certificate
   providers = {
     aws = aws.virginia
   }
@@ -78,6 +93,22 @@ module "records" {
     {
       name = var.subdomain
       type = "A"
+      alias = {
+        name    = module.cloudfront.cloudfront_distribution_domain_name
+        zone_id = module.cloudfront.cloudfront_distribution_hosted_zone_id
+      }
+    },
+    {
+      name = ""
+      type = "AAAA"
+      alias = {
+        name    = module.cloudfront.cloudfront_distribution_domain_name
+        zone_id = module.cloudfront.cloudfront_distribution_hosted_zone_id
+      }
+    },
+    {
+      name = var.subdomain
+      type = "AAAA"
       alias = {
         name    = module.cloudfront.cloudfront_distribution_domain_name
         zone_id = module.cloudfront.cloudfront_distribution_hosted_zone_id

@@ -1,4 +1,4 @@
-resource "kubernetes_deployment_v1" "hello_kubernetes" {
+resource "kubernetes_deployment_v1" "sample_app" {
   metadata {
     name = "hello-kubernetes"
   }
@@ -26,9 +26,12 @@ resource "kubernetes_deployment_v1" "hello_kubernetes" {
       }
     }
   }
+  depends_on = [
+    module.eks,
+  ]
 }
 
-resource "kubernetes_service_v1" "hello_kubernetes" {
+resource "kubernetes_service_v1" "sample_app" {
   metadata {
     name = "hello-kubernetes"
   }
@@ -42,12 +45,12 @@ resource "kubernetes_service_v1" "hello_kubernetes" {
     }
     type = "NodePort"
   }
+  depends_on = [
+    module.eks,
+  ]
 }
 
-resource "kubernetes_ingress_v1" "hello_kubernetes" {
-  depends_on = [
-    helm_release.aws_load_balancer_controller
-  ]
+resource "kubernetes_ingress_v1" "sample_app" {
   wait_for_load_balancer = true
   metadata {
     name = "hello-kubernetes"
@@ -83,15 +86,20 @@ resource "kubernetes_ingress_v1" "hello_kubernetes" {
       }
     }
   }
-
+  depends_on = [
+    module.irsa_role_load_balancer_controller,
+    helm_release.aws_load_balancer_controller,
+    module.vpc,
+    module.eks,
+  ]
 }
 
-resource "aws_route53_record" "ice01_naked" {
+resource "aws_route53_record" "origin" {
   name    = "origin.icekernelcloud01.com"
   type    = "CNAME"
   zone_id = data.aws_route53_zone.zone.zone_id
   ttl     = 360
   records = [
-    kubernetes_ingress_v1.hello_kubernetes.status[0].load_balancer[0].ingress[0].hostname,
+    kubernetes_ingress_v1.sample_app.status[0].load_balancer[0].ingress[0].hostname,
   ]
 }

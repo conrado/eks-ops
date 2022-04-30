@@ -1,3 +1,7 @@
+# Sat Apr 30 14:39:16 UTC 2022
+
+- fixed destroy command so everything is destroyed in proper order
+
 # Fri Apr 29 13:01:27 UTC 2022
 
 - moved kubernetes app into terraform configuration

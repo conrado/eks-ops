@@ -1,3 +1,4 @@
+
 module "irsa_role_load_balancer_controller" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
@@ -31,88 +32,6 @@ resource "kubernetes_service_account" "aws_load_balancer_controller" {
   }
 }
 
-# should we use just a kubernetes_role here?
-resource "kubernetes_cluster_role" "aws_load_balancer_controller" {
-  metadata {
-    name = "aws-load-balancer-controller"
-
-    labels = {
-      "app.kubernetes.io/name"       = "aws-load-balancer-controller"
-      "app.kubernetes.io/managed-by" = "terraform"
-    }
-  }
-
-  rule {
-    api_groups = [
-      "",
-      "extensions",
-    ]
-
-    resources = [
-      "configmaps",
-      "endpoints",
-      "events",
-      "ingresses",
-      "ingresses/status",
-      "services",
-    ]
-
-    verbs = [
-      "create",
-      "get",
-      "list",
-      "update",
-      "watch",
-      "patch",
-    ]
-  }
-
-  rule {
-    api_groups = [
-      "",
-      "extensions",
-    ]
-
-    resources = [
-      "nodes",
-      "pods",
-      "secrets",
-      "services",
-      "namespaces",
-    ]
-
-    verbs = [
-      "get",
-      "list",
-      "watch",
-    ]
-  }
-}
-
-resource "kubernetes_cluster_role_binding" "aws_load_balancer_controller" {
-  metadata {
-    name = "aws-load-balancer-controller"
-
-    labels = {
-      "app.kubernetes.io/name"       = "aws-load-balancer-controller"
-      "app.kubernetes.io/managed-by" = "terraform"
-    }
-  }
-
-  role_ref {
-    api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role.aws_load_balancer_controller.metadata[0].name
-  }
-
-  subject {
-    api_group = ""
-    kind      = "ServiceAccount"
-    name      = kubernetes_service_account.aws_load_balancer_controller.metadata[0].name
-    namespace = kubernetes_service_account.aws_load_balancer_controller.metadata[0].namespace
-  }
-}
-
 resource "helm_release" "aws_load_balancer_controller" {
   name            = "aws-load-balancer-controller"
   chart           = "aws-load-balancer-controller"
@@ -134,6 +53,9 @@ resource "helm_release" "aws_load_balancer_controller" {
     name  = "serviceAccount.create"
     value = "false"
   }
+  depends_on = [
+    kubernetes_service_account.aws_load_balancer_controller,
+  ]
 }
 
 module "origin_certificate" {
@@ -144,4 +66,13 @@ module "origin_certificate" {
   zone_id     = data.aws_route53_zone.zone.id
 
   tags = var.tags
+
+  ## terraform likes to destroy these before we get a chance to use them to
+  ## destroy the ALB we created that uses this certificate. so prevent destroy
+  depends_on = [
+    module.irsa_role_load_balancer_controller,
+    helm_release.aws_load_balancer_controller,
+    module.vpc,
+    module.eks,
+  ]
 }

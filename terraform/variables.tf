@@ -1,3 +1,8 @@
+variable "aws_region" {
+  description = "The AWS region we deploy to"
+  default     = "sa-east-1"
+}
+
 variable "cluster_name" {
   type    = string
   default = "ice01"
@@ -17,3 +22,4 @@ variable "tags" {
     ManagedBy = "terraform"
   }
 }
+

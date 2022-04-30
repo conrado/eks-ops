@@ -6,7 +6,7 @@
 - [x] route53, acm, cloudfront
 - [x] move all hello-kubernetes sample app to terraform resources
 - [ ] istio
-- [ ] flux
+- [ ] flux and flagger
 - [ ] find/build a sample app that uses both apigw and dynamodb
 - [ ] aws api gw
 - [ ] aws dynamodb

@@ -1,44 +1,80 @@
-# Developer Notes
+# most minimal sample of an EKS cluster provisioned with Terraform using SSL
 
-## requirements for this demo
+motivation: most of the examples I found were either old, didn't use SSL, had a
+lot of self-built terraform modules. In this demo we use only vendor modules or
+the excellent [terraform-aws-modules](https://github.com/terraform-aws-modules)
+community modules.
 
-you'll need to have an AWS account with a registered domain and hosted zone ready
-to deploy to. You should only need to customize the `domain_name` variable in
-`./terraform/variables.tf` (or apply some .tfvars file) and the aws region you
-wish to deploy to in `./terraform/providers.tf`
+this demo includes the following:
 
-besides that, you probably need the following:
+- [x] everything is created with Terraform
+- [x] Kubernetes on EKS using IRSA
+- [x] AWS-Load-Balancer-Controller ingress with TLS
+- [x] Route53 auto-configuration of domain names
+- [x] ACM auto-provisioned certificates
+- [x] Cloudfront distribution with some simple defaults (note that AWS requires
+  that you verify your AWS account to use the CDN, contact AWS support for that)
+
+in only 443 lines of code!
+
+## requirements for running this demo
+
+- You **must** have an AWS account with a **registered domain** and/or
+  **functioning hosted zone** ready to deploy to, and **Cloudfront enabled**
+- You **must** customize the `domain_name` variable in `variables.tf`
+- You *may* change `aws_region` to deploy elsewhere in `variables.tf`
+- You *may* change `cluster_name` as well in `variables.tf`
+
+assuming you are on mac, you need the following:
 
 ```console
+brew install tfenv kubectl helm awscli
 tfenv install 1.1.9
-brew install kubectl
-brew install helm
 ```
 
 ## setup everything
 
-to put up the cluster and generate your kube config:
+Note: *you should substitute example.com, us-east-1 and mycluster with what you*
+*configured in variables.tf*
+
+to put up the cluster:
 
 ```console
 terraform init
 terraform apply
-aws eks --region sa-east-1 update-kubeconfig --name ice01
+```
+
+generate your kube config and see pods running:
+
+```console
+aws eks --region us-east-1 update-kubeconfig --name mycluster
 kubectl get nodes
 ```
 
-The ALB ingress has been changed to accept only HTTPS connections.
+The ALB ingress only accepts HTTPS connections: [https://origin.example.com][1]
 
-It is now available on [https://origin.icekernelcloud01.com][1]
+The real site should be available on Cloudflare CDN:
 
-also try accessing the following to see Cloudflare CDN do some magic:
+- [https://example.com][2]
+- [https://www.example.com][3]
+- [http://example.com][4] will redirect to https
+- [http://www.example.com][5] will redirect to https
 
-- [https://icekernelcloud01.com][2]
-- [https://www.icekernelcloud01.com][3]
-- [http://icekernelcloud01.com][4]
-- [http://www.icekernelcloud01.com][5]
+[1]: https://origin.example.com
+[2]: https://example.com
+[3]: https://www.example.com
+[4]: http://example.com
+[5]: http://www.example.com
 
-[1]: https://origin.icekernelcloud01.com
-[2]: https://icekernelcloud01.com
-[3]: https://www.icekernelcloud01.com
-[4]: http://icekernelcloud01.com
-[5]: http://www.icekernelcloud01.com
+from here we can add a service mesh, gitops, centralized logging, monitoring,
+alerting, backup, autoscaling, instance termination handling, the list goes on
+
+I would love any feedback in case you see some better way of doing things
+
+## Cleanup
+
+To remove all created resources:
+
+```console
+terraform destroy
+```
