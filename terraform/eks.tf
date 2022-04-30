@@ -9,14 +9,17 @@ module "eks" {
 
   eks_managed_node_groups = {
     ng1 = {
-      ## keep demo cheap: default type is t3.small
-      # desired_capacity                     = 1
-      # max_capacity                         = 10
-      # min_capacity                         = 1
-      # instance_types                       = ["m5.large"]
+      desired_capacity                     = 1
+      max_capacity                         = 10
+      min_capacity                         = 1
+      instance_types                       = ["m5.large"]
       metadata_http_put_response_hop_limit = 2
     }
     ng2 = {
+      desired_capacity                     = 1
+      max_capacity                         = 10
+      min_capacity                         = 1
+      instance_types                       = ["m5.large"]
       metadata_http_put_response_hop_limit = 2
     }
     # ng3 = {

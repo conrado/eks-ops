@@ -14,8 +14,7 @@ this demo includes the following:
 - [x] ACM auto-provisioned certificates
 - [x] Cloudfront distribution with some simple defaults (note that AWS requires
   that you verify your AWS account to use the CDN, contact AWS support for that)
-
-in only 443 lines of code!
+- [ ] Flagger, Flux and Istio
 
 ## requirements for running this demo
 
@@ -29,6 +28,8 @@ assuming you are on mac, you need the following:
 
 ```console
 brew install tfenv kubectl helm awscli
+brew install fluxcd/tap/flux
+brew install jq yq
 tfenv install 1.1.9
 ```
 
