@@ -8,12 +8,12 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
 
   eks_managed_node_group_defaults = {
-    desired_capacity                     = 1
+    desired_capacity                     = 3
     max_capacity                         = 10
     min_capacity                         = 1
     instance_types                       = ["m5.large"]
     metadata_http_put_response_hop_limit = 2
-    key_name                             = "conrado@icekernel.com"
+    # key_name                             = "conrado@icekernel.com"
   }
 
   eks_managed_node_groups = {
@@ -23,14 +23,14 @@ module "eks" {
   }
 
   node_security_group_additional_rules = {
-    ingress_allow_ssh_from_bastion = {
-      type                     = "ingress"
-      protocol                 = "tcp"
-      from_port                = 22
-      to_port                  = 22
-      source_security_group_id = module.bastion.bastion_sg
-      description              = "Allow SSH from bastion"
-    }
+    # ingress_allow_ssh_from_bastion = {
+    #   type                     = "ingress"
+    #   protocol                 = "tcp"
+    #   from_port                = 22
+    #   to_port                  = 22
+    #   source_security_group_id = module.bastion.bastion_sg
+    #   description              = "Allow SSH from bastion"
+    # }
     ingress_allow_access_from_control_plane = {
       type                          = "ingress"
       protocol                      = "tcp"

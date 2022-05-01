@@ -1,11 +1,11 @@
 variable "aws_region" {
   description = "The AWS region we deploy to"
-  default     = "sa-east-1"
+  default     = "us-west-2"
 }
 
 variable "cluster_name" {
   type    = string
-  default = "my-cluster"
+  default = "ice"
 }
 
 variable "domain_name" {
