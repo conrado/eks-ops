@@ -7,6 +7,14 @@ module "eks" {
   subnet_ids      = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
 
+  cluster_enabled_log_types = [
+    "audit",
+    "api",
+    "authenticator",
+    "controllerManager",
+    "scheduler",
+  ]
+
   eks_managed_node_group_defaults = {
     desired_capacity                     = 3
     max_capacity                         = 10
@@ -20,6 +28,17 @@ module "eks" {
     ng1 = {}
     ng2 = {}
     # ng3 = {}
+  }
+
+  fargate_profiles = {
+    fargate_productcatalog = {
+      name = "fargate-productcatalog"
+      selectors = [
+        {
+          namespace = "prodcatalog-ns"
+        }
+      ]
+    }
   }
 
   node_security_group_additional_rules = {
