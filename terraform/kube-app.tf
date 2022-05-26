@@ -95,7 +95,7 @@ resource "kubernetes_ingress_v1" "sample_app" {
 }
 
 resource "aws_route53_record" "origin" {
-  name    = "origin.icekernelcloud01.com"
+  name    = "${var.eks_ingress_subdomain}.${var.domain_name}"
   type    = "CNAME"
   zone_id = data.aws_route53_zone.zone.zone_id
   ttl     = 360

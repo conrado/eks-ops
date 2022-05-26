@@ -1,6 +1,6 @@
 variable "aws_region" {
   description = "The AWS region we deploy to"
-  default     = "us-west-2"
+  default     = "sa-east-1"
 }
 
 variable "cluster_name" {
@@ -13,7 +13,11 @@ variable "domain_name" {
   default = "icekernelcloud01.com"
 }
 
-variable "subdomain" {
+variable "eks_ingress_subdomain" {
+  default = "origin"
+}
+
+variable "cloudfront_subdomain" {
   default = "www"
 }
 

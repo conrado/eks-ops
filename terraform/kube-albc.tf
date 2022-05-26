@@ -62,7 +62,7 @@ module "origin_certificate" {
   source  = "terraform-aws-modules/acm/aws"
   version = "~> 3.4.1"
 
-  domain_name = "origin.${var.domain_name}"
+  domain_name = "${var.eks_ingress_subdomain}.${var.domain_name}"
   zone_id     = data.aws_route53_zone.zone.id
 
   tags = var.tags
