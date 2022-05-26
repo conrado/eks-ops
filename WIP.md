@@ -1,6 +1,4 @@
 # WIP notes
 
-attempting to get this workshop running on this cluster
-https://github.com/stefanprodan/gitops-istio
-
-
+attempting app-mesh
+https://www.youtube.com/watch?v=BpinKF1nYGo
