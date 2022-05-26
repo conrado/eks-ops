@@ -1,6 +1,6 @@
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 18.20"
+  version = "~> 18.21"
 
   cluster_name    = var.cluster_name
   cluster_version = "1.22"
@@ -19,7 +19,7 @@ module "eks" {
   eks_managed_node_groups = {
     ng1 = {}
     ng2 = {}
-    # ng3 = { }
+    # ng3 = {}
   }
 
   node_security_group_additional_rules = {
