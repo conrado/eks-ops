@@ -82,17 +82,17 @@ resource "kubernetes_service_account" "prodcatalog-envoy-proxies" {
   }
 }
 
-data "aws_iam_policy_document" "assume_role" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRole"]
+# data "aws_iam_policy_document" "assume_role" {
+#   statement {
+#     effect  = "Allow"
+#     actions = ["sts:AssumeRole"]
 
-    principals {
-      type        = "Service"
-      identifiers = ["eks-fargate-pods.amazonaws.com"]
-    }
-  }
-}
+#     principals {
+#       type        = "Service"
+#       identifiers = ["eks-fargate-pods.amazonaws.com"]
+#     }
+#   }
+# }
 
 # resource "aws_iam_role" "prodcatalog_fargate_profile" {
 #   name = "eks-fargate-profile"

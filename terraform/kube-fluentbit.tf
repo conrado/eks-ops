@@ -44,7 +44,14 @@ module "iam_policy_fluentbit" {
   policy      = data.aws_iam_policy_document.fluentbit_fargate.json
 }
 
-resource "aws_iam_role_policy_attachment" "fluentbit_fargate" {
-  role       = module.eks.fargate_profiles.fargate_productcatalog.iam_role_name
-  policy_arn = module.iam_policy_fluentbit.arn
+module "irsa_fluentbit" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role-with-oidc"
+
+  role_name = "${var.cluster_name}-irsa-fluentbit"
+
+  provider_url = module.eks.oidc_provider
+
+  role_policy_arns = [
+    module.iam_policy_fluentbit.arn,
+  ]
 }

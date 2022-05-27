@@ -17,3 +17,10 @@ COMPLETE
 
   this means that we will have broken our pure IaC setup with this manual step.
   Correcting it will be left for after the tutorial is complete
+
+- got base app running.
+
+  there are a few tests to see if thigns are running... I'm usually running
+  inside an alpine shell and hitting these up:
+
+  `curl http://prodcatalog.prodcatalog-ns.svc.cluster.local:5000/products/`
