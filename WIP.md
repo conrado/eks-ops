@@ -24,3 +24,19 @@ COMPLETE
   inside an alpine shell and hitting these up:
 
   `curl http://prodcatalog.prodcatalog-ns.svc.cluster.local:5000/products/`
+
+## Install AWS AppMesh Controller
+
+added aws appmesh controller.
+
+to verify check the following have the correct output
+
+```
+kubectl get deployment appmesh-controller \
+    -n appmesh-system \
+    -o json  | jq -r ".spec.template.spec.containers[].image" | cut -f2 -d ':'
+
+kubectl get crds | grep appmesh
+
+kubectl -n appmesh-system get all
+```
